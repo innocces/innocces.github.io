@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="innocces">
 <meta property="og:description" content="写在前面的话本文只是对于官网文档的总结和个人使用经验结合的教程，如果和你的编程风格有出入请出门左转。由于之前使用过Vue和react,而微信小程序和Vue还有react也有相似之处，所以我会在阐述的过程中和两个框架进行比较(如果有阐述不对的地方请指出)。   主要参考微信小程序官方文档   正文开始准备工作 1.开发者账号，如果没有开发者账号可以选择体验版本，虽然不影响开发，但是不能实时在真机上">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-04-10T13:16:57.756Z">
+<meta property="og:updated_time" content="2018-04-11T14:18:31.976Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="微信小程序">
 <meta name="twitter:description" content="写在前面的话本文只是对于官网文档的总结和个人使用经验结合的教程，如果和你的编程风格有出入请出门左转。由于之前使用过Vue和react,而微信小程序和Vue还有react也有相似之处，所以我会在阐述的过程中和两个框架进行比较(如果有阐述不对的地方请指出)。   主要参考微信小程序官方文档   正文开始准备工作 1.开发者账号，如果没有开发者账号可以选择体验版本，虽然不影响开发，但是不能实时在真机上">
@@ -445,7 +445,130 @@
 </tr>
 </tbody>
 </table>
-
+<blockquote>
+<p>关于生命周期需要说一丢丢的关注点:<br>1.小程序的生命周期<br>onLaunch 小程序生命周期函数,且在小程序初始化时执行,有且只执行一次。<br>onShow 小程序生命周期函数,小程序从后台进入前台的时候会触发,这里需要注意一个触发顺序:先触发页面的<code>onShow</code>生命钩子再触发小程序的<code>onShow</code>生命周期钩子,所以在使用<code>onShow</code>的时候逻辑需要注意，而且从第三方跳转(场景主要是APP唤醒、小程序唤醒、公众号唤醒)唤醒时参数须从小程序的<code>onShow</code>生命周期中的params中获取，因为在初始化的过程中也会触发小程序的<code>onShow</code>，且<code>onShow</code>是可以多次触发的，这样可以保证每次唤醒的参数都是我们可取的。所以不应该在小程序<code>onLaunch</code>中获取回传参数。<br>2.页面的生命周期<br>onLoad  有且只在页面初始化时执行一次，若页面进入页面栈再次呼出则不会触发<code>onLoad</code>，只会触发<code>onShow</code>。若在跳转时附加参数，只可以在<code>onLoad</code>中获取，获取方式为<code>options.query</code><br>onShow  当页面初始化时执行一次，从页面栈中被呼出时(即位于栈顶)也会执行，所以如果想要在页面中执行每次展示更新数据之类的操作的话，建议在<code>onShow</code>中执行。<br>onHide  注意当页面非页面栈顶的同时会触发<code>onHide</code></p>
+</blockquote>
+<h4 id="data"><a href="#data" class="headerlink" title="data"></a>data</h4><blockquote>
+<p>小程序页面的<code>data</code>和<code>Vue</code>的<code>data</code>实现机制不太相同。</p>
+<ul>
+<li>小程序的data:初始化数据将作为页面的第一次渲染。<code>data</code> 将会以 <code>JSON</code> 的形式由逻辑层传至渲染层，所以其数据必须是可以转成 <code>JSON</code> 的格式：字符串，数字，布尔值，对象，数组。</li>
+<li>Vue 将遍历此对象所有的属性，并使用 <code>Object.defineProperty</code> 把这些属性全部转为 <code>getter/setter</code>。<br>使用上的区别<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span> 小程序</span><br><span class="line"></span><br><span class="line">Page(&#123;</span><br><span class="line">  data:&#123;</span><br><span class="line">    msg:<span class="string">'aaa'</span></span><br><span class="line">  &#125;,</span><br><span class="line">  changeData()&#123;</span><br><span class="line">    <span class="keyword">this</span>.setData(&#123;<span class="attr">msg</span>:<span class="string">'bbb'</span>&#125;);  <span class="comment">// 我们需要关注的是this.setData和react中的写法非常像，而且也是异步的。</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="number">2.</span> Vue</span><br><span class="line"></span><br><span class="line"><span class="keyword">new</span> Vue&#123;</span><br><span class="line">  el:<span class="string">'#app'</span>,</span><br><span class="line">  data:&#123;<span class="attr">msg</span>:<span class="string">'aaa'</span>&#125;,</span><br><span class="line">  methods:&#123;</span><br><span class="line">    changeData()&#123;<span class="keyword">this</span>.msg=<span class="string">'bbb'</span>&#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">or </span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span><br><span class="line">  name:<span class="string">'temp'</span>,</span><br><span class="line">  data()&#123;</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      msg:<span class="string">'aaa'</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  methods:&#123;</span><br><span class="line">    changeData()&#123;<span class="keyword">this</span>.msg=<span class="string">'bbb'</span>&#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;<span class="regexp">/script&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</blockquote>
+<h4 id="组件、api-这里不做详解，只在下面有需要的地方会对特定api讲解"><a href="#组件、api-这里不做详解，只在下面有需要的地方会对特定api讲解" class="headerlink" title="组件、api(这里不做详解，只在下面有需要的地方会对特定api讲解)"></a>组件、api(这里不做详解，只在下面有需要的地方会对特定api讲解)</h4><blockquote>
+<p>简单的概括一下: 微信给我们提供的组件有些像React-native的组件一样，更符合他的运行环境，而且组件中提供了很多便捷的属性和方法供我们使用;而api则是微信比较吸引开发者的地方，因为开发者可以通过微信提供的api调用微信所支持的一些能力，比如: 获取微信个人信息、绑定手机号、摄像头、罗盘等等。。。。。<br>传送门<a href="https://developers.weixin.qq.com/miniprogram/dev/component/" title="组件" target="_blank" rel="noopener">组件</a>、<a href="https://developers.weixin.qq.com/miniprogram/dev/api/" title="api" target="_blank" rel="noopener">api</a></p>
+</blockquote>
+<h4 id="路由"><a href="#路由" class="headerlink" title="路由"></a>路由</h4><blockquote>
+<p>在小程序中所有页面的路由全部由框架进行管理。框架以栈的形式维护了当前的所有页面。 当发生路由切换的时候，页面栈的表现如下：</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">路由方式</th>
+<th style="text-align:center">页面栈表现</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">初始化</td>
+<td style="text-align:center">新页面入栈</td>
+</tr>
+<tr>
+<td style="text-align:center">打开新页面</td>
+<td style="text-align:center">新页面入栈</td>
+</tr>
+<tr>
+<td style="text-align:center">页面重定向</td>
+<td style="text-align:center">当前页面出栈，新页面入栈</td>
+</tr>
+<tr>
+<td style="text-align:center">页面返回</td>
+<td style="text-align:center">页面不断出栈，直到目标返回页，新页面入栈</td>
+</tr>
+<tr>
+<td style="text-align:center">Tab 切换</td>
+<td style="text-align:center">页面全部出栈，只留下新的 Tab 页面</td>
+</tr>
+<tr>
+<td style="text-align:center">重加载</td>
+<td style="text-align:center">页面全部出栈，只留下新的页面</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>路由方式，对于路由的触发方式以及页面生命周期函数如下：</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">路由方式</th>
+<th style="text-align:center">触发时机</th>
+<th style="text-align:center">路由前页面</th>
+<th style="text-align:center">路由后页面</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">初始化</td>
+<td style="text-align:center">小程序打开的第一个页面</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">onLoad, onShow</td>
+</tr>
+<tr>
+<td style="text-align:center">打开新页面</td>
+<td style="text-align:center">调用 <code>API wx.navigateTo</code> 或使用组件 <code>&lt;navigator open-type=&quot;navigateTo&quot;/&gt;</code></td>
+<td style="text-align:center">onHide</td>
+<td style="text-align:center">onLoad, onShow</td>
+</tr>
+<tr>
+<td style="text-align:center">页面重定向</td>
+<td style="text-align:center">调用 <code>API wx.redirectTo</code> 或使用组件 <code>&lt;navigator open-type=&quot;redirectTo&quot;/&gt;</code></td>
+<td style="text-align:center">onUnload</td>
+<td style="text-align:center">onLoad, onShow</td>
+</tr>
+<tr>
+<td style="text-align:center">页面返回</td>
+<td style="text-align:center">调用 <code>API wx.navigateBack</code> 或使用组件<code>&lt;navigator open-type=&quot;navigateBack&quot;&gt;</code>或用户按左上角返回按钮</td>
+<td style="text-align:center">onUnload</td>
+<td style="text-align:center">onShow</td>
+</tr>
+<tr>
+<td style="text-align:center">Tab 切换</td>
+<td style="text-align:center">调用 <code>API wx.switchTab</code> 或使用组件 <code>&lt;navigator open-type=&quot;switchTab&quot;/&gt;</code> 或用户切换 Tab</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">重启动</td>
+<td style="text-align:center">调用 <code>API wx.reLaunch</code> 或使用组件 <code>&lt;navigator open-type=&quot;reLaunch&quot;/&gt;</code></td>
+<td style="text-align:center">onUnload</td>
+<td style="text-align:center">onLoad, onShow</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>关于路由需要注意的几点</p>
+<ul>
+<li><code>navigateTo</code>, <code>redirectTo</code> 只能打开非 tabBar 页面,若要打开tabbar页面需要使用<code>switchTab</code>。</li>
+<li><code>switchTab</code> 只能打开 tabBar 页面。</li>
+<li><code>reLaunch</code> 可以打开任意页面。</li>
+<li>页面底部的 tabBar 由页面决定，即只要是定义为 tabBar 的页面，底部都有 tabBar。</li>
+<li>调用页面路由带的参数可以在目标页面的<code>onLoad</code>中获取。</li>
+<li>页面栈最多可以承载五个页面，建议多使用<code>redirectTo</code>打开页面。</li>
+</ul>
+</blockquote>
+<h4 id="数据绑定"><a href="#数据绑定" class="headerlink" title="数据绑定"></a>数据绑定</h4><blockquote>
+<p>小程序和Vue都是采用 <code>Mustache</code> 语法，将变量用双花括号包裹起来<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">1. 小程序</span><br><span class="line"><span class="tag">&lt;<span class="name">view</span> <span class="attr">src</span>=<span class="string">"item-&#123;&#123;msg&#125;&#125;"</span>  <span class="attr">id</span>=<span class="string">"&#123;&#123; true ? msg : '' &#125;&#125;"</span>&gt;</span>&#123;&#123;msg&#125;&#125;<span class="tag">&lt;/<span class="name">view</span>&gt;</span></span><br><span class="line"></span><br><span class="line">2. Vue</span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">:msg</span>=<span class="string">"msg"</span> <span class="attr">:_msg</span>=<span class="string">" true ? msg : '' "</span>&gt;</span>&#123;&#123;msg&#125;&#125;<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">但在Vue中不推荐写过多的逻辑在&#123;&#123;&#125;&#125;中，这样对于后期维护是不利的，建议写在computed(即计算属性)中。</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<h4 id="指令-由于微信小程序提供的一些便捷的api和Vue提供的指令极为相似，所以这里我统称为指令"><a href="#指令-由于微信小程序提供的一些便捷的api和Vue提供的指令极为相似，所以这里我统称为指令" class="headerlink" title="指令(由于微信小程序提供的一些便捷的api和Vue提供的指令极为相似，所以这里我统称为指令)"></a>指令(由于微信小程序提供的一些便捷的api和Vue提供的指令极为相似，所以这里我统称为指令)</h4><ul>
+<li><p>v-for and wx:for</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">block</span>&gt;</span></span><br><span class="line">  // 不指定下标名和变量名是，默认下标为index，变量为item</span><br><span class="line">  <span class="tag">&lt;<span class="name">view</span> <span class="attr">wx:for</span>=<span class="string">"&#123;&#123;array&#125;&#125;"</span> <span class="attr">wx:key</span>=<span class="string">"index"</span>&gt;</span>&#123;&#123;index&#125;&#125;---&#123;&#123;item&#125;&#125;<span class="tag">&lt;/<span class="name">view</span>&gt;</span></span><br><span class="line">  // 也可指定变量和下标</span><br><span class="line">  <span class="tag">&lt;<span class="name">view</span> <span class="attr">wx:for</span>=<span class="string">"&#123;&#123;array&#125;&#125;"</span> <span class="attr">wx:for-item</span>=<span class="string">"ite"</span> <span class="attr">wx:for-index</span>=<span class="string">"idx"</span>  <span class="attr">wx:key</span>=<span class="string">"idx"</span>&gt;</span>&#123;&#123;idx&#125;&#125;---&#123;&#123;ite&#125;&#125;<span class="tag">&lt;/<span class="name">view</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">block</span>&gt;</span></span><br><span class="line"></span><br><span class="line">// 建议每次进行列表渲染的时候都写上wx:key,当数据改变触发渲染层重新渲染的时候，会校正带有 key 的组件，框架会确保他们被重新排序，而不是重新创建，以确保使组件保持自身的状态，并且提高列表渲染时的效率。</span><br><span class="line"></span><br><span class="line">Page(&#123;</span><br><span class="line">  data:&#123;</span><br><span class="line">    array:['1','2','3']</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">ul</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">li</span> <span class="attr">v-for</span>=<span class="string">"(item,index) in array"</span> <span class="attr">:key</span>=<span class="string">"index"</span>&gt;</span>&#123;&#123;item&#125;&#125;<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">ul</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="javascript">  <span class="keyword">export</span> <span class="keyword">default</span> &#123;</span></span><br><span class="line"><span class="javascript">    data()&#123;<span class="keyword">return</span> &#123;<span class="attr">array</span>:[<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>]&#125;&#125;,</span></span><br><span class="line"><span class="undefined">  &#125;,</span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>wx:if hidden</p>
+</li>
+</ul>
+<h4 id="未完待续"><a href="#未完待续" class="headerlink" title="未完待续"></a>未完待续</h4>
       
     </div>
     
@@ -626,7 +749,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#正文开始"><span class="nav-number">1.</span> <span class="nav-text">正文开始</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#准备工作"><span class="nav-number">1.1.</span> <span class="nav-text">准备工作</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#简述小程序"><span class="nav-number">1.2.</span> <span class="nav-text">简述小程序</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#小程序的简单工作原理"><span class="nav-number">1.3.</span> <span class="nav-text">小程序的简单工作原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#小程序开发目录结构-罗列的均为初始项目结构"><span class="nav-number">1.4.</span> <span class="nav-text">小程序开发目录结构(罗列的均为初始项目结构)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#生命周期"><span class="nav-number">1.5.</span> <span class="nav-text">生命周期</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#正文开始"><span class="nav-number">1.</span> <span class="nav-text">正文开始</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#准备工作"><span class="nav-number">1.1.</span> <span class="nav-text">准备工作</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#简述小程序"><span class="nav-number">1.2.</span> <span class="nav-text">简述小程序</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#小程序的简单工作原理"><span class="nav-number">1.3.</span> <span class="nav-text">小程序的简单工作原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#小程序开发目录结构-罗列的均为初始项目结构"><span class="nav-number">1.4.</span> <span class="nav-text">小程序开发目录结构(罗列的均为初始项目结构)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#生命周期"><span class="nav-number">1.5.</span> <span class="nav-text">生命周期</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#data"><span class="nav-number">1.6.</span> <span class="nav-text">data</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#组件、api-这里不做详解，只在下面有需要的地方会对特定api讲解"><span class="nav-number">1.7.</span> <span class="nav-text">组件、api(这里不做详解，只在下面有需要的地方会对特定api讲解)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#路由"><span class="nav-number">1.8.</span> <span class="nav-text">路由</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#数据绑定"><span class="nav-number">1.9.</span> <span class="nav-text">数据绑定</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#指令-由于微信小程序提供的一些便捷的api和Vue提供的指令极为相似，所以这里我统称为指令"><span class="nav-number">1.10.</span> <span class="nav-text">指令(由于微信小程序提供的一些便捷的api和Vue提供的指令极为相似，所以这里我统称为指令)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#未完待续"><span class="nav-number">1.11.</span> <span class="nav-text">未完待续</span></a></li></ol></li></ol></div>
             
 
           </div>
