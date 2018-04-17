@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="innocces">
 <meta property="og:description" content="写在前面的话本文只是对于官网文档的总结和个人使用经验结合的教程，如果和你的编程风格有出入请出门左转。由于之前使用过Vue和react,而微信小程序和Vue还有react也有相似之处，所以我会在阐述的过程中和两个框架进行比较(如果有阐述不对的地方请指出)。   主要参考微信小程序官方文档   正文开始准备工作 1.开发者账号，如果没有开发者账号可以选择体验版本，虽然不影响开发，但是不能实时在真机上">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-04-11T14:18:31.976Z">
+<meta property="og:updated_time" content="2018-04-17T12:42:45.297Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="微信小程序">
 <meta name="twitter:description" content="写在前面的话本文只是对于官网文档的总结和个人使用经验结合的教程，如果和你的编程风格有出入请出门左转。由于之前使用过Vue和react,而微信小程序和Vue还有react也有相似之处，所以我会在阐述的过程中和两个框架进行比较(如果有阐述不对的地方请指出)。   主要参考微信小程序官方文档   正文开始准备工作 1.开发者账号，如果没有开发者账号可以选择体验版本，虽然不影响开发，但是不能实时在真机上">
@@ -566,8 +566,94 @@
 <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">block</span>&gt;</span></span><br><span class="line">  // 不指定下标名和变量名是，默认下标为index，变量为item</span><br><span class="line">  <span class="tag">&lt;<span class="name">view</span> <span class="attr">wx:for</span>=<span class="string">"&#123;&#123;array&#125;&#125;"</span> <span class="attr">wx:key</span>=<span class="string">"index"</span>&gt;</span>&#123;&#123;index&#125;&#125;---&#123;&#123;item&#125;&#125;<span class="tag">&lt;/<span class="name">view</span>&gt;</span></span><br><span class="line">  // 也可指定变量和下标</span><br><span class="line">  <span class="tag">&lt;<span class="name">view</span> <span class="attr">wx:for</span>=<span class="string">"&#123;&#123;array&#125;&#125;"</span> <span class="attr">wx:for-item</span>=<span class="string">"ite"</span> <span class="attr">wx:for-index</span>=<span class="string">"idx"</span>  <span class="attr">wx:key</span>=<span class="string">"idx"</span>&gt;</span>&#123;&#123;idx&#125;&#125;---&#123;&#123;ite&#125;&#125;<span class="tag">&lt;/<span class="name">view</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">block</span>&gt;</span></span><br><span class="line"></span><br><span class="line">// 建议每次进行列表渲染的时候都写上wx:key,当数据改变触发渲染层重新渲染的时候，会校正带有 key 的组件，框架会确保他们被重新排序，而不是重新创建，以确保使组件保持自身的状态，并且提高列表渲染时的效率。</span><br><span class="line"></span><br><span class="line">Page(&#123;</span><br><span class="line">  data:&#123;</span><br><span class="line">    array:['1','2','3']</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">ul</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">li</span> <span class="attr">v-for</span>=<span class="string">"(item,index) in array"</span> <span class="attr">:key</span>=<span class="string">"index"</span>&gt;</span>&#123;&#123;item&#125;&#125;<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">ul</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="javascript">  <span class="keyword">export</span> <span class="keyword">default</span> &#123;</span></span><br><span class="line"><span class="javascript">    data()&#123;<span class="keyword">return</span> &#123;<span class="attr">array</span>:[<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>]&#125;&#125;,</span></span><br><span class="line"><span class="undefined">  &#125;,</span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
 </li>
 <li><p>wx:if hidden</p>
+<blockquote>
+<p> <code>wx:if</code>主要用于小程序做条件渲染使用，当表达式的值为<code>true</code>时，当前代码片段才会被渲染，配合使用的有<code>wx:else</code>、<code>wx:elif</code>。这里需要主要的是，如果表达式的值在初次渲染的时候为<code>false</code>的话，则第一次不做任何渲染，也就是说<code>wx:if</code>是惰性的.与<code>hidden</code>不同，<code>hidden</code>不论表达式的值是<code>true</code>还是<code>false</code>初次渲染的时候都会进行代码片段的解析，只是在表达式值变化的时候淡出的将<code>display</code>属性更改为<code>block</code>或<code>none</code>。<br><code>Vue</code>中的<code>v-if</code>、<code>v-show</code>和这一对的用法是一致的，且判定使用方式都一致。</p>
+</blockquote>
 </li>
 </ul>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">view</span> <span class="attr">wx:if</span>=<span class="string">"&#123;&#123; num1 - num2 &gt; 0 &#125;&#125;"</span>&gt;</span>&#123;&#123; num1 - num2 &#125;&#125;<span class="tag">&lt;/<span class="name">view</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">view</span> <span class="attr">wx:else</span>&gt;</span>&#123;&#123; msg &#125;&#125;<span class="tag">&lt;/<span class="name">view</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">view</span> <span class="attr">hidden</span>=<span class="string">"&#123;&#123; num1 - num2 &gt; 0 &#125;&#125;"</span>&gt;</span>hidden<span class="tag">&lt;/<span class="name">view</span>&gt;</span></span><br><span class="line"></span><br><span class="line">/*.js*/</span><br><span class="line">Page(&#123;</span><br><span class="line">  data:&#123;</span><br><span class="line">    num1:1,</span><br><span class="line">    num2:2,</span><br><span class="line">    msg:'wx:else'</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">v-if</span>=<span class="string">"num1 - num2 &gt; 0"</span>&gt;</span>&#123;&#123; computedNum &#125;&#125;<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">v-else</span>&gt;</span>&#123;&#123; msg &#125;&#125;<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">v-show</span>=<span class="string">"false"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="javascript">  <span class="keyword">export</span> <span class="keyword">default</span> &#123;</span></span><br><span class="line"><span class="undefined">    data: &#123;</span></span><br><span class="line"><span class="undefined">      num1: 1,</span></span><br><span class="line"><span class="undefined">      num2: 2,</span></span><br><span class="line"><span class="javascript">      msg : <span class="string">'v-if'</span></span></span><br><span class="line"><span class="undefined">    &#125;,</span></span><br><span class="line"><span class="undefined">    computed:&#123;</span></span><br><span class="line"><span class="undefined">      computedNum()&#123;</span></span><br><span class="line"><span class="javascript">        <span class="keyword">return</span> <span class="keyword">this</span>.num1 - <span class="keyword">this</span>.num2</span></span><br><span class="line"><span class="undefined">      &#125;</span></span><br><span class="line"><span class="undefined">    &#125;</span></span><br><span class="line"><span class="undefined">  &#125;</span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>tip: 由于数据都是响应式的，所以我们无需操作dom，直接操作数据的同时，视图会根据我们数据的变化而做出对应的改变，这就是数据驱动页面的好处。如果需要做一些根据数据变化的选项卡或者条件判断是否显示某些东西的时候，这两个指令当之无愧。但是在使用的时候要从渲染的角度多考虑一些，比如你有一个代码块在页面中数据会频繁变化，那么应该使用hidden，这样可以减少页面渲染的代价，让你得页面响应的更快一些。</p>
+</blockquote>
+<ul>
+<li>bindtap、catchtap(事件机制)<blockquote>
+<p>小程序中的事件和<code>vue</code>中略有不同，小程序直接将时间分为两种，一种为冒泡型事件:<code>bindtap</code>(真实的为<code>bindHandler</code>);一种为捕获型事件:<code>catchtap</code>(真实的为<code>catchHandler</code>);由于小程序绑定事件时是无法传参的，所以需要依赖小程序组件中提供的另一个属性进行参数的传递:<code>data-xx=&quot;xxx&quot;</code>。在绑定时间函数的事件对象中我们可以获取到我们需要的这些参数。</p>
+</blockquote>
+</li>
+</ul>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">view</span> <span class="attr">bindtap</span>=<span class="string">"getInfo"</span> <span class="attr">data-msg</span>=<span class="string">"this is msg"</span> <span class="attr">catchlongpress</span>=<span class="string">"longPress"</span>&gt;</span> &#123;&#123; msg ? msg : 'nothing' &#125;&#125; <span class="tag">&lt;/<span class="name">view</span>&gt;</span></span><br><span class="line"> /* .js */</span><br><span class="line">Page(&#123;</span><br><span class="line">  data:&#123; msg:'' &#125;,</span><br><span class="line">  // bindtap</span><br><span class="line">  getInfo(event)&#123;</span><br><span class="line">    // 可以在event.target.dataset或event.currentTarget.dataset中获取data- 字段下的值。</span><br><span class="line">    let &#123;dataset&#125; = event.target || event.currentTarget;</span><br><span class="line">    let &#123; msg &#125; = dataset;</span><br><span class="line">    this.setData(&#123; msg &#125;);</span><br><span class="line">  &#125;,</span><br><span class="line">  // catchlogpress</span><br><span class="line">  longPress(event)&#123;</span><br><span class="line">    // 这里其实就是想验证同一个事情,所以就互相调用了</span><br><span class="line">    this.getInfo(event);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>支持事件如下表:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">类型</th>
+<th style="text-align:center">触发条件</th>
+<th style="text-align:center">最低版本</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">touchstart</td>
+<td style="text-align:center">手指触摸动作开始</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">touchmove</td>
+<td style="text-align:center">手指触摸后移动</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">touchcancel</td>
+<td style="text-align:center">手指触摸动作被打断，如来电提醒，弹窗</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">touchend</td>
+<td style="text-align:center">手指触摸动作结束</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">tap</td>
+<td style="text-align:center">手指触摸后马上离开</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">longpress</td>
+<td style="text-align:center">手指触摸后，超过350ms再离开，如果指定了事件回调函数并触发了这个事件，tap事件将不被触发</td>
+<td style="text-align:center">1.5.0</td>
+</tr>
+<tr>
+<td style="text-align:center">longtap</td>
+<td style="text-align:center">手指触摸后，超过350ms再离开（推荐使用longpress事件代替）</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">transitionend</td>
+<td style="text-align:center">会在 WXSS transition 或 wx.createAnimation 动画结束后触发</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">animationstart</td>
+<td style="text-align:center">会在一个 WXSS animation 动画开始时触发</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">animationiteration</td>
+<td style="text-align:center">会在一个 WXSS animation 一次迭代结束时触发</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">animationend</td>
+<td style="text-align:center">会在一个 WXSS animation 动画完成时触发</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">touchforcechange</td>
+<td style="text-align:center">在支持 3D Touch 的 iPhone 设备，重按时会触发</td>
+<td style="text-align:center">1.9.90</td>
+</tr>
+</tbody>
+</table>
 <h4 id="未完待续"><a href="#未完待续" class="headerlink" title="未完待续"></a>未完待续</h4>
       
     </div>
@@ -623,6 +709,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/17/wx-promise-http/" rel="prev" title="wx-promise-http">
+                wx-promise-http <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -703,7 +793,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-count">3</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -716,7 +806,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-count">15</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
